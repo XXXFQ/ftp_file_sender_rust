@@ -1,0 +1,12 @@
+[package]
+name = "ftp_file_sender"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+chrono = { version = "0.4.39", features = ["serde"] }
+clap = { version = "4", features = ["derive"] }
+fern = { version = "0.7.1", features = ["colored"] }
+ftp = "3.0.1"
+env_logger = "0.11.6"
+log = "0.4"
