@@ -7,7 +7,7 @@
             "name": "Rust Debug Launch",
             "program": "${workspaceRoot}/target/debug/ftp_file_sender.exe",
             "args": [
-                "-h"
+                "192.168.11.16", "./test.txt", "-p", "5000"
             ],
             "cwd": "${workspaceRoot}/target/debug/",
             "sourceLanguages": ["rust"]

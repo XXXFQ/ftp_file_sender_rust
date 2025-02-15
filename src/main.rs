@@ -26,7 +26,7 @@ struct Args {
     folder: String,
 
     /// 接続に使用するポート番号
-    #[arg(short = 'p', long = "port", default_value_t = 5000)]
+    #[arg(short = 'p', long = "port", default_value_t = 20)]
     port: u16,
 
     /// 接続タイムアウト (秒)
