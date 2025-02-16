@@ -11,7 +11,7 @@ use crate::logger::setup_logger;
 
 /// FTP File Sender
 ///
-/// このプログラムは、FTP を使って指定したファイルをサーバに送信します。
+/// FTP を使って指定したファイルをサーバに送信します。
 #[derive(Parser, Debug)]
 #[command(author, version, about = "FTP File Sender", long_about = None)]
 struct Args {
@@ -76,16 +76,11 @@ fn send_file_over_ftp(
     let addr: String = format!("{}:{}", host, port);
     let timeout: Duration = Duration::from_secs_f64(timeout_secs);
     let mut ftp_stream: FtpStream = FtpStream::connect(addr)?;
+
     // タイムアウト設定
     ftp_stream.get_ref().set_read_timeout(Some(timeout))?;
     ftp_stream.get_ref().set_write_timeout(Some(timeout))?;
     info!("Connected to {} on port {}", host, port);
-
-    // サーバからのウェルカムメッセージ（取得に失敗しても無視）
-    match ftp_stream.read_response(220) {
-        Ok(response) => info!("Server response: {}", response.1),
-        Err(e) => info!("Could not get welcome message: {}", e),
-    };
 
     // ログイン処理：ユーザー名とパスワードが指定されていればそれを使用、なければ匿名ログイン
     if let (Some(user), Some(pass)) = (username, password) {
