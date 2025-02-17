@@ -2,7 +2,7 @@ use ftp::FtpStream;
 use log::{error, info};
 use std::error::Error;
 use std::fs::File;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 /// FTP 送信機能を提供する構造体
@@ -27,8 +27,8 @@ impl FtpSender {
             host: host.to_string(),
             port,
             timeout: Duration::from_secs_f64(timeout_secs),
-            username: username.map(|s| s.to_string()),
-            password: password.map(|s| s.to_string()),
+            username: username.map(|s: &str| s.to_string()),
+            password: password.map(|s: &str| s.to_string()),
         }
     }
 
@@ -43,7 +43,7 @@ impl FtpSender {
         // ファイルパスを正規化して、ディレクトリトラバーサル攻撃対策
         let source_path: PathBuf = std::fs::canonicalize(source_file_path)?;
         if !source_path.is_file() {
-            let err_msg = format!(
+            let err_msg: String = format!(
                 "Source file '{}' does not exist or is not a file.",
                 source_file_path
             );
@@ -52,13 +52,15 @@ impl FtpSender {
         }
 
         // 送信するファイル名を取得
-        let filename = source_path
+        let filename: &std::ffi::OsStr = source_path
             .file_name()
             .ok_or("Failed to get the source file name")?;
+        let target_file_path = Path::new(target_folder).join(filename);
+        let target_file_path_str = target_file_path.to_string_lossy();
 
         // FTP サーバへの接続
-        let addr = format!("{}:{}", self.host, self.port);
-        let mut ftp_stream = FtpStream::connect(addr)?;
+        let addr: String = format!("{}:{}", self.host, self.port);
+        let mut ftp_stream: FtpStream = FtpStream::connect(addr)?;
         ftp_stream.get_ref().set_read_timeout(Some(self.timeout))?;
         ftp_stream.get_ref().set_write_timeout(Some(self.timeout))?;
         info!("Connected to {} on port {}", self.host, self.port);
@@ -75,18 +77,13 @@ impl FtpSender {
             }
         }
 
-        // リモートの target_folder に移動。存在しなければ作成してから移動
-        self.ensure_remote_folder_exists(&mut ftp_stream, target_folder)?;
-
         // ファイル送信
         info!(
             "Sending file '{}' to folder '{}' on the server",
             source_file_path, target_folder
         );
-        let mut file = File::open(&source_path)?;
-        // 現在の作業ディレクトリが target_folder に切り替わっているため、ファイル名のみ指定
-        let filename_str = filename.to_string_lossy();
-        ftp_stream.put(&filename_str, &mut file)?;
+        let mut file: File = File::open(&source_path)?;
+        ftp_stream.put(&target_file_path_str, &mut file)?;
         info!(
             "File '{}' sent successfully to folder '{}'",
             source_file_path, target_folder
@@ -96,26 +93,6 @@ impl FtpSender {
         ftp_stream.quit()?;
         info!("FTP connection closed");
 
-        Ok(())
-    }
-
-    /// リモートフォルダーが存在するか確認し、存在しなければ作成して移動する
-    fn ensure_remote_folder_exists(
-        &self,
-        ftp_stream: &mut FtpStream,
-        folder: &str,
-    ) -> Result<(), Box<dyn Error>> {
-        match ftp_stream.cwd(folder) {
-            Ok(_) => {
-                info!("Remote folder '{}' exists. Switched to it.", folder);
-            }
-            Err(_) => {
-                info!("Remote folder '{}' does not exist. Creating it...", folder);
-                ftp_stream.mkdir(folder)?;
-                ftp_stream.cwd(folder)?;
-                info!("Remote folder '{}' created and switched to.", folder);
-            }
-        }
         Ok(())
     }
 }
