@@ -34,7 +34,7 @@ FTP プロトコルを利用してファイルをサーバーに送信するた�
 ### 使用例
 
 ```bash
-ftp-file-sender 192.168.1.3 ./example_file.txt -f /uploads -p 21 -t 15 -u myuser -pw mypassword
+ftp_file_sender 192.168.1.3 ./example_file.txt -f /uploads -p 21 -t 15 -u myuser -pw mypassword
 ```
 
 上記の例では、FTP サーバー `192.168.1.3` のポート `21` に接続し、`myuser` と `mypassword` を用いてログインした後、`example_file.txt` をサーバーの `/uploads` ディレクトリにアップロードします。接続タイムアウトは 15 秒に設定されています。
@@ -56,7 +56,7 @@ ftp-file-sender 192.168.1.3 ./example_file.txt -f /uploads -p 21 -t 15 -u myuser
     cargo build --release
     ```
 
-ビルドが完了すると、実行ファイルは `target/release/ftp_file_sender_rust` に生成されます。
+ビルドが完了すると、実行ファイルは `target/release` に生成されます。
 
 ## ライセンス
 
