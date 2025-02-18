@@ -1,16 +1,70 @@
 {
+    // IntelliSense を使用して利用可能な属性を学べます。
+    // 既存の属性の説明をホバーして表示します。
+    // 詳細情報は次を確認してください: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Rust Debug Launch",
-            "program": "${workspaceRoot}/target/debug/ftp_file_sender.exe",
+            "name": "Debug unit tests in library 'ftp_file_sender'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=ftp_file_sender"
+                ],
+                "filter": {
+                    "name": "ftp_file_sender",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'ftp_file_sender'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=ftp_file_sender",
+                    "--package=ftp_file_sender"
+                ],
+                "filter": {
+                    "name": "ftp_file_sender",
+                    "kind": "bin"
+                }
+            },
             "args": [
-                "192.168.11.16", "./test.txt", "-p", "5000"
+                "192.168.11.16",
+                "./examples/data/test_file.txt",
+                "-p", "5000",
+                "-f", "/uploads",
+                "-u", "arm"
             ],
-            "cwd": "${workspaceRoot}/target/debug/",
-            "sourceLanguages": ["rust"]
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'ftp_file_sender'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=ftp_file_sender",
+                    "--package=ftp_file_sender"
+                ],
+                "filter": {
+                    "name": "ftp_file_sender",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
         }
     ]
 }
